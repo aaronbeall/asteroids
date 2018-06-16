@@ -1,0 +1,23 @@
+{
+  "name": "asteroids",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aaronbeall/asteroids.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aaronbeall/asteroids/issues"
+  },
+  "homepage": "https://github.com/aaronbeall/asteroids#readme",
+  "dependencies": {
+    "@types/stats.js": "^0.17.0",
+    "stats.js": "^0.17.0"
+  }
+}
