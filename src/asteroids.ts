@@ -1,14 +1,13 @@
-import * as Stats from "stats.js";
+import Stats from "stats.js";
 
-function play() {
+setTimeout(create);
+
+function create() {
   const container = createContainerElement();
   container.style.overflow = "hidden";
   document.body.appendChild(container);
 
-  requestAnimationFrame(() => {
-    const game = new Game(container);
-    game.start();
-  });
+  const game = new Game(container);
 }
 
 class Game {
@@ -16,8 +15,8 @@ class Game {
   
   objects: GameObject[] = [];
 
-  animationFrameHandle: number;
-  lastUpdateTime: number;
+  animationFrameHandle?: number;
+  lastUpdateTime?: number;
   
   stats = new Stats();
 
@@ -26,6 +25,7 @@ class Game {
     
     this.addRocks(3);
     this.addPlayer();
+    this.start();
   }
 
   start() {
@@ -49,7 +49,7 @@ class Game {
   };
 
   stop() {
-    cancelAnimationFrame(this.animationFrameHandle);
+    this.animationFrameHandle && cancelAnimationFrame(this.animationFrameHandle);
   }
 
   addRocks(count: number, source?: { x: number; y: number; iteration: number; }) {
@@ -130,14 +130,13 @@ class Game {
 abstract class GameObject {
   x: number = 0;
   y: number = 0;
-  radius: number;
+  radius: number = 0;
   rotation: number = 0;
   friction: number = 0;
   vector: { x: number; y: number } = { x: 0, y: 0 };
   graphics = createContainerElement();
 
-  constructor(public game: Game) {
-  }
+  constructor(public game: Game) { }
 
   abstract draw(): void;
 
@@ -164,7 +163,7 @@ abstract class GameObject {
 
   render() {
     this.graphics.style.left = `${this.x}px`;
-    this.graphics.style.marginTop = `${this.y}px`;
+    this.graphics.style.top = `${this.y}px`;
     this.graphics.style.transform = `rotate(${this.rotation}deg)`;
     this.graphics.style.transformOrigin = `top left`;
   }
@@ -325,7 +324,7 @@ class Bullet extends GameObject {
 }
 
 class Particle extends GameObject {
-  canvas: HTMLCanvasElement;
+  canvas!: HTMLCanvasElement;
   color = "gray";
   minSpeed = 10;
   maxSpeed = 50;
