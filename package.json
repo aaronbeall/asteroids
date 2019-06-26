@@ -6,6 +6,7 @@
   "scripts": {
     "start": "parcel ./src/index.html --open --no-cache",
     "build": "parcel build ./src/index.html",
+    "check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
