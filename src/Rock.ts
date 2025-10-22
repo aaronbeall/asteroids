@@ -47,4 +47,9 @@ export class Rock extends GameObject {
       }
     }
   }
+
+  kill() {
+    this.health = 1;
+    this.hit();
+  }
 }

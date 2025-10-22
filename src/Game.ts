@@ -1,10 +1,11 @@
 import Stats from "stats.js";
 import { distanceBetween } from "./math-utils";
-import { Particle } from "./Particle";
+import { Particle, ParticleOptions } from "./Particle";
 import { Bullet } from "./Bullet";
 import { Player } from "./Player";
 import { Rock } from "./Rock";
 import { GameObject } from "./GameObject";
+import { HUD } from "./HUD";
 
 export class Game {
   static FRAME_TIME = 1000 / 60;
@@ -12,13 +13,26 @@ export class Game {
   animationFrameHandle?: number;
   lastUpdateTime?: number;
   stats = new Stats();
+  hud: HUD;
 
   constructor(public container: HTMLElement) {
     container.appendChild(this.stats.dom);
+    this.hud = new HUD(this);
     this.addRocks(3);
     this.addPlayer();
     this.start();
+
+    window.addEventListener('keydown', this.handleKeyDown);
   }
+
+  handleKeyDown = (e: KeyboardEvent) => {
+    if (e.code === 'Enter') {
+      const player = this.objects.find(o => o instanceof Player);
+      if (player && player.health <= 0) {
+        this.reset();
+      }
+    }
+  };
 
   start() {
     this.lastUpdateTime = performance.now();
@@ -33,9 +47,25 @@ export class Game {
       obj.update(frameTime);
       obj.render();
     });
+    if (this.hud) {
+      const player = this.objects.find(o => o instanceof Player) as Player | undefined;
+      this.hud.resize();
+      this.hud.update({ playerHealth: player ? player.health : 0, playerMaxHealth: player ? player.maxHealth : 0, playerDead: !!(player && player.dead) });
+    }
     this.stats.end();
     this.animationFrameHandle = requestAnimationFrame(this.update);
   };
+
+  reset() {
+    // remove all existing objects and recreate initial state
+    // detach graphics first to avoid modifying while iterating
+    const copy = [...this.objects];
+    copy.forEach(obj => this.removeObject(obj));
+    this.objects = [];
+    // re-add initial scene
+    this.addRocks(3);
+    this.addPlayer();
+  }
 
   stop() {
     this.animationFrameHandle && cancelAnimationFrame(this.animationFrameHandle);
@@ -104,11 +134,11 @@ export class Game {
     y: number;
     angleDegrees?: number;
     spreadDegrees?: number;
-  }) {
+  }, opts?: ParticleOptions) {
     const { x, y, angleDegrees = 0, spreadDegrees = 360 } = source;
     while (count--) {
       const degrees = angleDegrees - spreadDegrees / 2 + spreadDegrees * Math.random();
-      this.addObject(this.createParticle({ x, y, degrees }));
+      this.addObject(this.createParticle({ x, y, degrees }, opts));
     }
   }
 
@@ -116,8 +146,8 @@ export class Game {
     x: number;
     y: number;
     degrees: number;
-  }) {
-    const particle = new Particle(this, degrees);
+  }, opts?: ParticleOptions) {
+    const particle = new Particle(this, degrees, opts);
     particle.x = x;
     particle.y = y;
     return particle;
@@ -149,6 +179,7 @@ export class Game {
       return distanceBetween(point, obj) <= obj.radius + radius;
     });
   }
+
   get viewport() {
     return this.container.getBoundingClientRect();
   }

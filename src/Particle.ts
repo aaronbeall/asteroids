@@ -2,20 +2,33 @@ import { Game } from "./Game";
 import { GameObject } from "./GameObject";
 import { vector, vectorLength } from "./math-utils";
 
+export interface ParticleOptions {
+  color?: string;
+  minSpeed?: number;
+  maxSpeed?: number;
+  maxScale?: number;
+  friction?: number;
+  radius?: number;
+}
+
 export class Particle extends GameObject {
   canvas!: HTMLCanvasElement;
   color = "gray";
   minSpeed = 10;
   maxSpeed = 50;
   maxScale = 15;
+  friction = 0.88;
+  radius = 2;
 
-  constructor(game: Game, degrees: number) {
+  constructor(game: Game, degrees: number, opts: ParticleOptions = {}) {
     super(game);
-    this.radius = 2;
     this.rotation = degrees;
+
+    // apply options with defaults
+    Object.assign(this, opts);
+
     const speed = this.minSpeed + (this.maxSpeed - this.minSpeed) * Math.random();
     this.vector = vector({ length: speed, degrees });
-    this.friction = .88;
   }
 
   draw() {

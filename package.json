@@ -6,9 +6,7 @@
   "scripts": {
     "start": "parcel ./src/index.html --open --no-cache",
     "clean": "rm -rf ./docs",
-    "build:relative": "parcel build ./src/index.html --out-dir ./docs --public-url ./",
-    "build:ghpages": "parcel build ./src/index.html --out-dir ./docs --public-url /asteroids/",
-    "build": "npm run build:relative",
+    "build": "parcel build ./src/index.html --out-dir ./docs --public-url ./",
     "check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npm run check && npm run clean && npm run build"
