@@ -10,6 +10,8 @@ import { HUD } from "./HUD";
 export class Game {
   static FRAME_TIME = 1000 / 60;
   objects: GameObject[] = [];
+  level = 0;
+  bestLevel = 0;
   animationFrameHandle?: number;
   lastUpdateTime?: number;
   stats = new Stats();
@@ -18,6 +20,13 @@ export class Game {
   constructor(public container: HTMLElement) {
     container.appendChild(this.stats.dom);
     this.hud = new HUD(this);
+    // load best level from localStorage
+    try {
+      const v = localStorage.getItem('asteroids:bestLevel');
+      if (v) this.bestLevel = parseInt(v, 10) || 0;
+    } catch (e) {}
+
+    this.level = 0;
     this.addRocks(3);
     this.addPlayer();
     this.start();
@@ -47,10 +56,21 @@ export class Game {
       obj.update(frameTime);
       obj.render();
     });
+    // if no rocks remain, advance level
+    const rocksLeft = this.objects.filter(o => o instanceof Rock).length;
+    if (rocksLeft === 0) {
+      this.level += 1;
+      const spawn = 3 + this.level;
+      this.addRocks(spawn);
+      if (this.level > this.bestLevel) {
+        this.bestLevel = this.level;
+        try { localStorage.setItem('asteroids:bestLevel', String(this.bestLevel)); } catch (e) {}
+      }
+    }
     if (this.hud) {
       const player = this.objects.find(o => o instanceof Player) as Player | undefined;
       this.hud.resize();
-      this.hud.update({ playerHealth: player ? player.health : 0, playerMaxHealth: player ? player.maxHealth : 0 });
+      this.hud.update({ playerHealth: player ? player.health : 0, playerMaxHealth: player ? player.maxHealth : 0, level: this.level, bestLevel: this.bestLevel });
     }
     this.stats.end();
     this.animationFrameHandle = requestAnimationFrame(this.update);
@@ -62,7 +82,8 @@ export class Game {
     const copy = [...this.objects];
     copy.forEach(obj => this.removeObject(obj));
     this.objects = [];
-    // re-add initial scene
+    // reset level and re-add initial scene
+    this.level = 0;
     this.addRocks(3);
     this.addPlayer();
   }

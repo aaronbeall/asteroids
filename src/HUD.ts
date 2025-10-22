@@ -3,6 +3,8 @@ import { Game } from './Game';
 export interface HUDState {
   playerHealth: number;
   playerMaxHealth: number;
+  level?: number;
+  bestLevel?: number;
 }
 
 export class HUD {
@@ -94,6 +96,26 @@ export class HUD {
     const segWidth = (barWidth - (segments - 1) * 6) / segments;
     const healthX = this.canvas.width - padding - barWidth;
     const y = padding;
+
+    // draw level and best level to the left of the health bar (horizontal layout)
+    const levelText = `Level ${state.level ?? 0}`;
+    const bestLabel = `🏆 ${state.bestLevel ?? 0}`;
+    const startX = healthX - 160;
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.font = '14px sans-serif';
+
+    // draw level (white)
+    this.ctx.fillStyle = 'black';
+    this.ctx.fillText(levelText, startX, y + barHeight / 2);
+
+    // draw best (gold) to the right of level with a small gap
+    const levelW = this.ctx.measureText(levelText).width;
+    const gap = 12;
+    this.ctx.fillStyle = '#ffd700';
+    this.ctx.fillText(bestLabel, startX + levelW + gap, y + barHeight / 2);
+    // restore baseline to default for other text
+    this.ctx.textBaseline = 'alphabetic';
 
     for (let i = 0; i < segments; i++) {
       const sx = healthX + i * (segWidth + 6);
