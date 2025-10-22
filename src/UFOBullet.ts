@@ -59,7 +59,7 @@ export class UFOBullet extends GameObject {
     // hit rocks
     const rocks = this.game.getObjectsIntersectingCircle({ x: this.x, y: this.y, radius: this.radius }, Rock);
     if (rocks.length) {
-      rocks.forEach(r => r.hit());
+      rocks.forEach(r => r.kill());
       this.game.addParticles(8, { x: this.x, y: this.y });
       this.game.removeObject(this);
       return;

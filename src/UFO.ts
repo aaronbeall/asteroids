@@ -4,6 +4,7 @@ import { vector, angleBetween } from "./math-utils";
 import { Player } from "./Player";
 import { UFOBullet } from "./UFOBullet";
 import { Powerup } from "./Powerup";
+import { Theme } from "./Theme";
 
 export class UFO extends GameObject {
   speed = 0.02;
@@ -13,7 +14,8 @@ export class UFO extends GameObject {
 
   constructor(game: Game) {
     super(game);
-    this.radius = 22;
+    // make the UFO larger for more presence
+    this.radius = 34;
     this.friction = .995;
     this.fireCooldown = 60 + Math.random() * 120;
   }
@@ -21,11 +23,34 @@ export class UFO extends GameObject {
   draw() {
     const { canvas, ctx } = this.createCanvas();
     ctx.beginPath();
-    ctx.ellipse(this.radius, this.radius, this.radius, this.radius / 2, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#616161';
+    // UFO body uses theme foreground
+    ctx.ellipse(this.radius, this.radius, this.radius, this.radius * 0.6, 0, 0, Math.PI * 2);
+    ctx.fillStyle = Theme.foreground;
     ctx.fill();
-    ctx.fillStyle = '#81c784';
-    ctx.fillRect(this.radius - 6, this.radius - 6, 12, 12);
+
+    // inner shape: draw a centered triangle instead of a rectangle
+    const cx = this.radius;
+    const cy = this.radius;
+    // make the inner triangle much smaller so it's a subtle detail
+    const triW = this.radius * 0.4;
+    const triH = this.radius * 0.35;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - triH / 2);
+    ctx.lineTo(cx - triW / 2, cy + triH / 2);
+    ctx.lineTo(cx + triW / 2, cy + triH / 2);
+    ctx.closePath();
+  // fill triangle with theme foreground (user requested triangle use foreground color)
+  ctx.fillStyle = Theme.foreground;
+  ctx.fill();
+
+    // draw a solid dome on top of the main body (smaller ellipse)
+    ctx.beginPath();
+    const domeW = this.radius * 1.0;
+    const domeH = this.radius * 0.55;
+    ctx.ellipse(cx, cy - this.radius * 0.18, domeW * 0.55, domeH * 0.55, 0, 0, Math.PI * 2);
+    // dome uses theme.background inverted (use foreground for outline)
+    ctx.fillStyle = Theme.background;
+    ctx.fill();
   }
 
   update(frameTime: number) {

@@ -1,6 +1,7 @@
 import { Game } from "./Game";
 import { GameObject } from "./GameObject";
 import { vector } from "./math-utils";
+import { Theme } from "./Theme";
 
 export class Rock extends GameObject {
   spin: number;
@@ -29,6 +30,7 @@ export class Rock extends GameObject {
       ctx.lineTo(x, y);
     }
     ctx.closePath();
+    ctx.strokeStyle = Theme.foreground;
     ctx.stroke();
   }
 

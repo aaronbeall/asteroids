@@ -7,6 +7,7 @@ import { Rock } from "./Rock";
 import { UFO } from "./UFO";
 import { GameObject } from "./GameObject";
 import { HUD } from "./HUD";
+import { Theme, randomTheme } from "./Theme";
 
 export class Game {
   static FRAME_TIME = 1000 / 60;
@@ -15,8 +16,11 @@ export class Game {
   bestLevel = 0;
   animationFrameHandle?: number;
   lastUpdateTime?: number;
+  // next scheduled UFO spawn timestamp (ms)
+  nextUfoSpawnAt?: number;
   stats = new Stats();
   hud: HUD;
+  ufoSpawnInterval = 30_000;
 
   constructor(public container: HTMLElement) {
     container.appendChild(this.stats.dom);
@@ -28,8 +32,11 @@ export class Game {
     } catch (e) {}
 
     this.level = 0;
+    Theme.setTheme(randomTheme());
     this.addRocks(3);
     this.addPlayer();
+  // schedule first UFO spawn 60s from now
+  this.nextUfoSpawnAt = performance.now() + 30_000;
     this.start();
 
     window.addEventListener('keydown', this.handleKeyDown);
@@ -61,12 +68,20 @@ export class Game {
       obj.update(frameTime);
       obj.render();
     });
+
+    // spawn a UFO every 60 seconds while the game is running
+    if (this.nextUfoSpawnAt && time >= this.nextUfoSpawnAt) {
+      this.addObject(this.createUFO());
+      // schedule next spawn
+      this.nextUfoSpawnAt = time + this.ufoSpawnInterval;
+    }
     // if no rocks remain, advance level
     const rocksLeft = this.objects.filter(o => o instanceof Rock).length;
     if (rocksLeft === 0) {
       this.level += 1;
       const spawn = 3 + this.level;
       this.addRocks(spawn);
+      Theme.setTheme(randomTheme());
       if (this.level > this.bestLevel) {
         this.bestLevel = this.level;
         try { localStorage.setItem('asteroids:bestLevel', String(this.bestLevel)); } catch (e) {}
@@ -89,8 +104,11 @@ export class Game {
     this.objects = [];
     // reset level and re-add initial scene
     this.level = 0;
+    Theme.setTheme(randomTheme());
     this.addRocks(3);
     this.addPlayer();
+    // reset UFO spawn timer
+    this.nextUfoSpawnAt = performance.now() + this.ufoSpawnInterval;
   }
 
   stop() {

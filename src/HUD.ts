@@ -1,4 +1,5 @@
 import { Game } from './Game';
+import { Theme } from './Theme';
 
 export interface HUDState {
   playerHealth: number;
@@ -105,8 +106,7 @@ export class HUD {
     this.ctx.textBaseline = 'middle';
     this.ctx.font = '14px sans-serif';
 
-    // draw level (white)
-    this.ctx.fillStyle = 'black';
+    this.ctx.fillStyle = Theme.foreground;
     this.ctx.fillText(levelText, startX, y + barHeight / 2);
 
     // draw best (gold) to the right of level with a small gap
@@ -133,14 +133,11 @@ export class HUD {
       }
       this.ctx.fillRect(sx, y, segWidth, barHeight);
       // segment border
-      this.ctx.strokeStyle = '#000';
+      this.ctx.strokeStyle = Theme.background;
       this.ctx.strokeRect(sx, y, segWidth, barHeight);
     }
 
-    // health label
-    this.ctx.fillStyle = 'white';
-    this.ctx.textAlign = 'right';
-    this.ctx.fillText('Health', healthX + barWidth, y + barHeight + 12);
-    this.ctx.textAlign = 'left';
+  // remove explicit 'Health' label; keep alignment reset
+  this.ctx.textAlign = 'left';
   }
 }

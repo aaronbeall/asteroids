@@ -3,6 +3,7 @@ import { GameObject } from "./GameObject";
 import { Rock } from "./Rock";
 import { UFO } from "./UFO";
 import { vector } from "./math-utils";
+import { Theme } from "./Theme";
 
 export class Bullet extends GameObject {
   speed = 10;
@@ -29,6 +30,7 @@ export class Bullet extends GameObject {
     ctx.lineTo(0, this.radius);
     ctx.lineTo(this.radius * 1.5, 0);
     ctx.closePath();
+    ctx.fillStyle = Theme.foreground;
     ctx.fill();
     canvas.style.transform = `scaleX(3)`;
   }

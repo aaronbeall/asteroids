@@ -4,6 +4,7 @@ import { vector } from "./math-utils";
 import { KeyboardController } from "./KeyboardController";
 import { Particle } from "./Particle";
 import { Rock } from "./Rock";
+import { Theme } from "./Theme";
 
 export class Player extends GameObject {
   rotationSpeed = 3;
@@ -16,7 +17,7 @@ export class Player extends GameObject {
   dead = false;
   invulnerable = false;
   invulnerableUntil = 0;
-  color = 'black';
+  color = Theme.foreground;
 
   constructor(game: Game) {
     super(game);
@@ -113,11 +114,11 @@ export class Player extends GameObject {
     if (this.invulnerable) {
       const now = performance.now();
       if (now >= this.invulnerableUntil) {
-        this.invulnerable = false;
-        this.blinking = false;
-        this.color = 'black';
-        this.draw();
-      }
+          this.invulnerable = false;
+          this.blinking = false;
+          this.color = Theme.foreground;
+          this.draw();
+        }
     }
 
     // collision detection with rocks

@@ -1,6 +1,7 @@
 import { Game } from "./Game";
 import { GameObject } from "./GameObject";
 import { vector, vectorLength } from "./math-utils";
+import { Theme } from "./Theme";
 
 export interface ParticleOptions {
   color?: string;
@@ -13,7 +14,7 @@ export interface ParticleOptions {
 
 export class Particle extends GameObject {
   canvas!: HTMLCanvasElement;
-  color = "gray";
+  color = Theme.foreground;
   minSpeed = 10;
   maxSpeed = 50;
   maxScale = 15;
