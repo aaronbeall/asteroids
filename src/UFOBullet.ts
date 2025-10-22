@@ -7,6 +7,8 @@ import { vector } from "./math-utils";
 export class UFOBullet extends GameObject {
   speed = 6;
   life = 180;
+  // simple counter to throttle trail emission
+  private trailTick = 0;
 
   constructor(game: Game, degrees: number, initVector: { x: number; y: number }) {
     super(game);
@@ -36,6 +38,13 @@ export class UFOBullet extends GameObject {
     if (this.life <= 0) {
       this.game.removeObject(this);
       return;
+    }
+
+    // emit a small green trail periodically
+    this.trailTick += frameTime;
+    if (this.trailTick >= 2) { // emit roughly every couple frames
+      this.trailTick = 0;
+      this.game.addParticles(1, { x: this.x, y: this.y }, { color: '#66bb6a', minSpeed: .5, maxSpeed: 3, maxScale: 12, friction: 0.9, radius: 1 });
     }
 
     // hit player

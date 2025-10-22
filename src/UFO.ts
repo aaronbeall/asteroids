@@ -9,11 +9,13 @@ export class UFO extends GameObject {
   speed = 0.02;
   health = 6;
   fireCooldown = 0;
+  aimSpread = 6;
 
   constructor(game: Game) {
     super(game);
     this.radius = 22;
     this.friction = .995;
+    this.fireCooldown = 60 + Math.random() * 120;
   }
 
   draw() {
@@ -40,7 +42,10 @@ export class UFO extends GameObject {
       this.fireCooldown -= frameTime;
       if (this.fireCooldown <= 0) {
         this.fireCooldown = 120 + Math.random() * 240;
-        const bullet = new UFOBullet(this.game, angle, this.vector);
+        // apply random aim spread so UFO shots are not perfectly accurate
+        const spread = (Math.random() * 2 - 1) * this.aimSpread;
+        const aimed = angle + spread;
+        const bullet = new UFOBullet(this.game, aimed, this.vector);
         bullet.x = this.x;
         bullet.y = this.y;
         this.game.addObject(bullet);
