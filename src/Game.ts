@@ -79,9 +79,10 @@ export class Game {
     const rocksLeft = this.objects.filter(o => o instanceof Rock).length;
     if (rocksLeft === 0) {
       this.level += 1;
+      Theme.setTheme(randomTheme());
+      this.objects.forEach(obj => obj.draw());
       const spawn = 3 + this.level;
       this.addRocks(spawn);
-      Theme.setTheme(randomTheme());
       if (this.level > this.bestLevel) {
         this.bestLevel = this.level;
         try { localStorage.setItem('asteroids:bestLevel', String(this.bestLevel)); } catch (e) {}
