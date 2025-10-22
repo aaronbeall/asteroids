@@ -22,4 +22,4 @@ var e;!function(t,n){"object"==typeof exports&&"undefined"!=typeof module?module
 },{"stats.js":"dnrf","./math-utils":"aS9Q","./Particle":"OH2U","./Bullet":"QcFy","./Player":"lbff","./Rock":"TsCN"}],"aTsH":[function(require,module,exports) {
 "use strict";var e=require("./Game"),t=require("./dom-utils");function r(){var r=(0,t.createContainerElement)();r.style.overflow="hidden",document.body.appendChild(r);new e.Game(r)}setTimeout(r);
 },{"./Game":"3jKS","./dom-utils":"he1Q"}]},{},["aTsH"], null)
-//# sourceMappingURL=/asteroids.97e3116b.js.map
+//# sourceMappingURL=asteroids.97e3116b.js.map
