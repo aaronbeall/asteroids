@@ -16,14 +16,38 @@ export class Player extends GameObject {
   dead = false;
   invulnerable = false;
   invulnerableUntil = 0;
-  flashInterval = 80; // ms
   color = 'black';
-  private lastFlashPhase: number | null = null;
 
   constructor(game: Game) {
     super(game);
     this.radius = 12;
     this.friction = .99;
+  }
+
+  hit(damage = 1) {
+    if (this.invulnerable || this.dead) return;
+    const now = performance.now();
+    this.health -= damage;
+
+    // spawn red sparks
+    this.game.addParticles(16, { x: this.x, y: this.y, angleDegrees: 0, spreadDegrees: 360 }, { color: 'red', minSpeed: 2, maxSpeed: 12, maxScale: 12, friction: .92 });
+
+    if (this.health <= 0) {
+      // big dramatic burst and mark dead
+      this.game.addParticles(64, { x: this.x, y: this.y, angleDegrees: 0, spreadDegrees: 360 }, { color: 'red', minSpeed: 2, maxSpeed: 24, maxScale: 24, friction: .92 });
+      this.game.addParticles(64, { x: this.x, y: this.y, angleDegrees: 0, spreadDegrees: 360 }, { color: 'red', minSpeed: 1, maxSpeed: 24, maxScale: 24, friction: .98 });
+      this.dead = true;
+      this.graphics.style.display = 'none';
+      return;
+    }
+
+    // set invulnerability (timestamp) and enable visible blinking
+    this.invulnerable = true;
+    this.invulnerableUntil = now + 1000;
+    this.color = 'red';
+    this.draw();
+    this.blinkPhase = 100;
+    this.blinking = true;
   }
 
   draw() {
@@ -85,22 +109,14 @@ export class Player extends GameObject {
       this.game.addBullet({ x: this.x + offset.x, y: this.y + offset.y, degrees: this.rotation, vector: this.vector });
     }
 
-    // handle invulnerability timing and flashing
-    const now = performance.now();
+    // handle invulnerability expiry using a timestamp
     if (this.invulnerable) {
+      const now = performance.now();
       if (now >= this.invulnerableUntil) {
         this.invulnerable = false;
+        this.blinking = false;
         this.color = 'black';
-        this.lastFlashPhase = null;
         this.draw();
-      } else {
-        // flash effect: toggle color between red and black
-        const phase = Math.floor(now / this.flashInterval) % 2;
-        if (this.lastFlashPhase !== phase) {
-          this.lastFlashPhase = phase;
-          this.color = phase ? 'red' : 'black';
-          this.draw();
-        }
       }
     }
 
@@ -111,25 +127,8 @@ export class Player extends GameObject {
           // break the rock we collided with
           hits.forEach(rock => rock.kill());
 
-          // take one hit
-          this.health -= 1;
-
-          // spawn red sparks via game helper
-          this.game.addParticles(16, { x: this.x, y: this.y, angleDegrees: 0, spreadDegrees: 360 }, { color: 'red', minSpeed: 2, maxSpeed: 12, maxScale: 12, friction: .92 });
-
-          // if health dropped to zero or below, spawn a massive red burst and mark dead
-          if (this.health <= 0) {
-            // big dramatic burst
-            this.game.addParticles(64, { x: this.x, y: this.y, angleDegrees: 0, spreadDegrees: 360 }, { color: 'red', minSpeed: 2, maxSpeed: 24, maxScale: 24, friction: .92 });
-            this.game.addParticles(64, { x: this.x, y: this.y, angleDegrees: 0, spreadDegrees: 360 }, { color: 'red', minSpeed: 1, maxSpeed: 24, maxScale: 24, friction: .98 });
-            this.dead = true;
-            // hide the ship's graphics immediately
-            this.graphics.style.display = 'none';
-          }
-
-          // set invulnerability
-          this.invulnerable = true;
-          this.invulnerableUntil = now + 1000;
+          // player takes damage
+          this.hit(1);
       }
     }
   }

@@ -4,6 +4,7 @@ import { Particle, ParticleOptions } from "./Particle";
 import { Bullet } from "./Bullet";
 import { Player } from "./Player";
 import { Rock } from "./Rock";
+import { UFO } from "./UFO";
 import { GameObject } from "./GameObject";
 import { HUD } from "./HUD";
 
@@ -37,9 +38,13 @@ export class Game {
   handleKeyDown = (e: KeyboardEvent) => {
     if (e.code === 'Enter') {
       const player = this.objects.find(o => o instanceof Player);
-      if (player && player.health <= 0) {
+      if (player && player.dead) {
         this.reset();
       }
+    }
+    if (e.code === 'KeyA') {
+      // spawn a UFO at random edge for testing
+      this.addObject(this.createUFO());
     }
   };
 
@@ -121,6 +126,28 @@ export class Game {
     player.x = this.viewport.width / 2;
     player.y = this.viewport.height / 2;
     return player;
+  }
+
+  createUFO() {
+    const ufo = new UFO(this);
+    // spawn at a random edge
+    const edge = Math.floor(Math.random() * 4);
+    const vw = this.viewport.width;
+    const vh = this.viewport.height;
+    if (edge === 0) { // top
+      ufo.x = Math.random() * vw;
+      ufo.y = -ufo.radius * 2;
+    } else if (edge === 1) { // right
+      ufo.x = vw + ufo.radius * 2;
+      ufo.y = Math.random() * vh;
+    } else if (edge === 2) { // bottom
+      ufo.x = Math.random() * vw;
+      ufo.y = vh + ufo.radius * 2;
+    } else { // left
+      ufo.x = -ufo.radius * 2;
+      ufo.y = Math.random() * vh;
+    }
+    return ufo;
   }
 
   addBullet(args: {
