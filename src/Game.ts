@@ -50,7 +50,7 @@ export class Game {
     if (this.hud) {
       const player = this.objects.find(o => o instanceof Player) as Player | undefined;
       this.hud.resize();
-      this.hud.update({ playerHealth: player ? player.health : 0, playerMaxHealth: player ? player.maxHealth : 0, playerDead: !!(player && player.dead) });
+      this.hud.update({ playerHealth: player ? player.health : 0, playerMaxHealth: player ? player.maxHealth : 0 });
     }
     this.stats.end();
     this.animationFrameHandle = requestAnimationFrame(this.update);
