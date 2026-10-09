@@ -1,7 +1,9 @@
 import { Game } from "./Game";
 import { GameObject } from "./GameObject";
 import { Rock } from "./Rock";
+import { UFO } from "./UFO";
 import { vector } from "./math-utils";
+import { Theme } from "./Theme";
 
 export class Bullet extends GameObject {
   speed = 10;
@@ -28,6 +30,7 @@ export class Bullet extends GameObject {
     ctx.lineTo(0, this.radius);
     ctx.lineTo(this.radius * 1.5, 0);
     ctx.closePath();
+    ctx.fillStyle = Theme.foreground;
     ctx.fill();
     canvas.style.transform = `scaleX(3)`;
   }
@@ -48,6 +51,15 @@ export class Bullet extends GameObject {
         this.game.addParticles(5, { x: this.x, y: this.y });
         this.game.removeObject(this);
         collidedRocks.forEach(rock => rock.hit());
+      }
+      else {
+        const ufoHits = this.game.getObjectsIntersectingCircle({ x: this.x, y: this.y, radius: -this.impactDepth }, UFO);
+        if (ufoHits.length) {
+          // damage UFO
+          try { (ufoHits[0] as UFO).hit(1); } catch (e) {}
+          this.game.addParticles(8, { x: this.x, y: this.y }, { color: 'orange', minSpeed: 2, maxSpeed: 12 });
+          this.game.removeObject(this);
+        }
       }
     }
   }

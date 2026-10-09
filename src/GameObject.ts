@@ -13,6 +13,8 @@ export abstract class GameObject {
     y: number;
   } = { x: 0, y: 0 };
   graphics = createContainerElement();
+  blinking = false;
+  blinkPhase = 1000;
 
   constructor(public game: Game) { }
 
@@ -44,6 +46,15 @@ export abstract class GameObject {
     this.graphics.style.top = `${this.y}px`;
     this.graphics.style.transform = `rotate(${this.rotation}deg)`;
     this.graphics.style.transformOrigin = `top left`;
+
+    if (this.blinking) {
+      const now = performance.now();
+      // use blinkingPhase (ms) for the full fade-in/out period
+      const phase = (Math.sin((now / this.blinkPhase) * Math.PI * 2) + 1) / 2;
+      this.graphics.style.opacity = String(phase);
+    } else {
+      this.graphics.style.opacity = '1';
+    }
   }
 
   loop() {

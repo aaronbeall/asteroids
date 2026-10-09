@@ -32,3 +32,9 @@ export function distanceBetween(from: { x: number; y: number; }, to: { x: number
   const deltaY = from.y - to.y;
   return Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
 }
+
+export function angleBetween(from: { x: number; y: number }, to: { x: number; y: number }): number {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  return Math.atan2(dy, dx) * 180 / Math.PI;
+}
